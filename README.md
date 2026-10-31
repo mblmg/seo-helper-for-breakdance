@@ -37,9 +37,9 @@ Danach prüft das Plugin alle zwölf Stunden, ob es auf GitHub ein neueres Relea
 
 1. Versionsnummer an zwei Stellen in `imm-seo-helfer.php` erhöhen: im Kopf (`Version:`) und in `IMM_SH_VERSION`.
 2. Im `CHANGELOG.md` einen Abschnitt `## X.Y.Z – Datum` ergänzen.
-3. Committen, pushen und einen Tag setzen: `git tag vX.Y.Z && git push origin vX.Y.Z`
+3. Committen und auf `main` pushen.
 
-Die GitHub-Action unter `.github/workflows/release.yml` prüft die Versionsnummern, baut `imm-seo-helfer.zip` und legt das Release mit den Notizen aus dem Changelog an. Ab dann verteilen sich die Updates von selbst.
+Die GitHub-Action unter `.github/workflows/release.yml` merkt, dass es für diese Versionsnummer noch kein Release gibt. Sie prüft die Angaben, baut `imm-seo-helfer.zip` und legt das Release `vX.Y.Z` mit den Notizen aus dem Changelog an. Ab dann verteilen sich die Updates von selbst. Commits ohne neue Versionsnummer lösen kein Release aus. Ein fehlgeschlagener Lauf lässt sich unter Actions → Release → „Run workflow“ wiederholen.
 
 ## Aufbau
 
@@ -51,7 +51,7 @@ includes/modul-*.php          je ein Helfer
 includes/admin.php            Einstellungsseite
 includes/updates.php          Updates über GitHub-Releases
 lib/plugin-update-checker/    Bibliothek für die Updates (YahnisElsts, MIT)
-.github/workflows/release.yml baut bei Versions-Tags das Release-ZIP
+.github/workflows/release.yml baut bei neuer Versionsnummer das Release
 assets/                       CSS und JS der Einstellungsseite
 uninstall.php                 räumt beim Löschen die Einstellungen auf
 ```

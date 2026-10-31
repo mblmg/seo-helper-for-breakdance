@@ -1,15 +1,22 @@
 name: Release
 
-# Baut bei jedem Versions-Tag (z. B. v1.2.0) das Plugin-ZIP und legt ein GitHub-Release an.
-# Die installierten Plugins holen sich ihre Updates aus diesen Releases.
+# Sobald auf main eine neue Versionsnummer im Plugin steht, baut diese Action das
+# Plugin-ZIP und legt das GitHub-Release mit Tag vX.Y.Z an. Die installierten Plugins
+# holen sich ihre Updates aus diesen Releases. Commits ohne neue Versionsnummer
+# lösen nichts aus. Über „Run workflow“ lässt sich ein fehlgeschlagener Lauf wiederholen.
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
+  workflow_dispatch:
 
 permissions:
   contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 jobs:
   release:
@@ -17,35 +24,50 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Versionsnummern prüfen
+      - name: Version ermitteln
+        id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          TAG="${GITHUB_REF_NAME#v}"
-          KOPF=$(grep -m1 -oP '^\s*\*\s*Version:\s*\K[0-9][0-9.]*' imm-seo-helfer.php)
+          VERSION=$(grep -m1 -oP '^\s*\*\s*Version:\s*\K[0-9][0-9.]*' imm-seo-helfer.php)
           KONSTANTE=$(grep -m1 -oP "IMM_SH_VERSION', '\K[0-9][0-9.]*" imm-seo-helfer.php)
-          if [ "$TAG" != "$KOPF" ] || [ "$TAG" != "$KONSTANTE" ]; then
-            echo "::error::Tag $TAG passt nicht zur Version im Plugin (Kopf $KOPF, Konstante $KONSTANTE)."
+          echo "Version im Plugin: $VERSION"
+          if gh release view "v$VERSION" >/dev/null 2>&1; then
+            echo "Release v$VERSION gibt es schon, nichts zu tun."
+            echo "neu=nein" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ "$VERSION" != "$KONSTANTE" ]; then
+            echo "::error::Version im Plugin-Kopf ($VERSION) und IMM_SH_VERSION ($KONSTANTE) stimmen nicht überein."
             exit 1
           fi
-          if ! grep -q "^## $TAG " CHANGELOG.md; then
-            echo "::error::Im CHANGELOG fehlt ein Abschnitt für $TAG."
+          if ! grep -q "^## $VERSION " CHANGELOG.md; then
+            echo "::error::Im CHANGELOG fehlt ein Abschnitt „## $VERSION – Datum“."
             exit 1
           fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "neu=ja" >> "$GITHUB_OUTPUT"
 
       - name: Plugin-ZIP bauen
+        if: steps.version.outputs.neu == 'ja'
         run: |
           mkdir -p build/imm-seo-helfer
           git archive HEAD | tar -x -C build/imm-seo-helfer
           cd build && zip -rq imm-seo-helfer.zip imm-seo-helfer
 
       - name: Release-Notizen aus dem CHANGELOG
+        if: steps.version.outputs.neu == 'ja'
         run: |
-          awk -v v="${GITHUB_REF_NAME#v}" 'index($0, "## " v " ") == 1 {f=1; next} /^## / {f=0} f' CHANGELOG.md > notizen.md
+          awk -v v="${{ steps.version.outputs.version }}" 'index($0, "## " v " ") == 1 {f=1; next} /^## / {f=0} f' CHANGELOG.md > notizen.md
           cat notizen.md
 
       - name: Release anlegen
+        if: steps.version.outputs.neu == 'ja'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" build/imm-seo-helfer.zip \
-            --title "Version ${GITHUB_REF_NAME#v}" \
+          V="${{ steps.version.outputs.version }}"
+          gh release create "v$V" build/imm-seo-helfer.zip \
+            --target "$GITHUB_SHA" \
+            --title "Version $V" \
             --notes-file notizen.md
