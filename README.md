@@ -27,6 +27,20 @@ Kategorie „SEO-Helfer“ in der Auswahl der dynamischen Daten:
 
 Auf dem ersten bzw. letzten Kapitel und in ausgeschalteten Bereichen sind die Kapitelfelder leer. Elemente dafür mit der Bedingung „ist nicht leer“ ausblenden.
 
+## Installation und Updates
+
+Einmalig von Hand installieren: unter [Releases](https://github.com/mblmg/seo-helper-for-breakdance/releases) die Datei `imm-seo-helfer.zip` herunterladen und in WordPress unter Plugins → Installieren → Plugin hochladen einspielen.
+
+Danach prüft das Plugin alle zwölf Stunden, ob es auf GitHub ein neueres Release gibt, und meldet es WordPress als Update. Automatische Updates sind beim Aktivieren eingeschaltet. WordPress installiert neue Versionen dann von selbst, meist innerhalb eines Tages. In der Plugin-Liste lässt sich das pro Website abschalten, und „Nach Updates suchen“ prüft sofort.
+
+## Neue Version veröffentlichen
+
+1. Versionsnummer an zwei Stellen in `imm-seo-helfer.php` erhöhen: im Kopf (`Version:`) und in `IMM_SH_VERSION`.
+2. Im `CHANGELOG.md` einen Abschnitt `## X.Y.Z – Datum` ergänzen.
+3. Committen, pushen und einen Tag setzen: `git tag vX.Y.Z && git push origin vX.Y.Z`
+
+Die GitHub-Action unter `.github/workflows/release.yml` prüft die Versionsnummern, baut `imm-seo-helfer.zip` und legt das Release mit den Notizen aus dem Changelog an. Ab dann verteilen sich die Updates von selbst.
+
 ## Aufbau
 
 ```
@@ -35,6 +49,9 @@ includes/optionen.php         Einstellungen, Erkennung von Breakdance und Yoast
 includes/breakdance-bilder.php  Bilder im Breakdance-Elementbaum finden
 includes/modul-*.php          je ein Helfer
 includes/admin.php            Einstellungsseite
+includes/updates.php          Updates über GitHub-Releases
+lib/plugin-update-checker/    Bibliothek für die Updates (YahnisElsts, MIT)
+.github/workflows/release.yml baut bei Versions-Tags das Release-ZIP
 assets/                       CSS und JS der Einstellungsseite
 uninstall.php                 räumt beim Löschen die Einstellungen auf
 ```

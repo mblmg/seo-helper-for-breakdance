@@ -1,0 +1,51 @@
+name: Release
+
+# Baut bei jedem Versions-Tag (z. B. v1.2.0) das Plugin-ZIP und legt ein GitHub-Release an.
+# Die installierten Plugins holen sich ihre Updates aus diesen Releases.
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Versionsnummern prüfen
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          KOPF=$(grep -m1 -oP '^\s*\*\s*Version:\s*\K[0-9][0-9.]*' imm-seo-helfer.php)
+          KONSTANTE=$(grep -m1 -oP "IMM_SH_VERSION', '\K[0-9][0-9.]*" imm-seo-helfer.php)
+          if [ "$TAG" != "$KOPF" ] || [ "$TAG" != "$KONSTANTE" ]; then
+            echo "::error::Tag $TAG passt nicht zur Version im Plugin (Kopf $KOPF, Konstante $KONSTANTE)."
+            exit 1
+          fi
+          if ! grep -q "^## $TAG " CHANGELOG.md; then
+            echo "::error::Im CHANGELOG fehlt ein Abschnitt für $TAG."
+            exit 1
+          fi
+
+      - name: Plugin-ZIP bauen
+        run: |
+          mkdir -p build/imm-seo-helfer
+          git archive HEAD | tar -x -C build/imm-seo-helfer
+          cd build && zip -rq imm-seo-helfer.zip imm-seo-helfer
+
+      - name: Release-Notizen aus dem CHANGELOG
+        run: |
+          awk -v v="${GITHUB_REF_NAME#v}" 'index($0, "## " v " ") == 1 {f=1; next} /^## / {f=0} f' CHANGELOG.md > notizen.md
+          cat notizen.md
+
+      - name: Release anlegen
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" build/imm-seo-helfer.zip \
+            --title "Version ${GITHUB_REF_NAME#v}" \
+            --notes-file notizen.md

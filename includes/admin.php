@@ -246,8 +246,15 @@ function imm_sh_seite()
         <p class="imm-sh__fuss">
             <?php
             /* translators: %s: Versionsnummer */
-            echo esc_html(sprintf(__('SEO-Helfer für Breakdance, Version %s, von i-make.media', 'imm-seo-helfer'), IMM_SH_VERSION));
+            echo esc_html(sprintf(__('SEO-Helfer für Breakdance, Version %s, von i-make.media.', 'imm-seo-helfer'), IMM_SH_VERSION));
+            echo ' ';
+            if (wp_is_auto_update_enabled_for_type('plugin') && in_array(plugin_basename(IMM_SH_DATEI), (array) get_site_option('auto_update_plugins', []), true)) {
+                esc_html_e('Neue Versionen installieren sich automatisch.', 'imm-seo-helfer');
+            } else {
+                esc_html_e('Neue Versionen erscheinen unter Plugins als Update.', 'imm-seo-helfer');
+            }
             ?>
+            <a href="<?php echo esc_url(IMM_SH_REPO); ?>" target="_blank" rel="noopener"><?php esc_html_e('Versionen auf GitHub', 'imm-seo-helfer'); ?></a>
         </p>
     </div>
     <?php

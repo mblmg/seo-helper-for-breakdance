@@ -88,4 +88,5 @@ function imm_sh_aktivieren()
     if (get_option(IMM_SH_OPTION) === false) {
         add_option(IMM_SH_OPTION, imm_sh_optionen());
     }
+    imm_sh_auto_updates_einschalten();
 }

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0 – 2026-10-31
+
+- Updates über GitHub: Neue Versionen kommen aus den Releases dieses Repositorys und erscheinen in WordPress wie normale Plugin-Updates (Plugin Update Checker 5.7).
+- Automatische Updates sind beim Aktivieren eingeschaltet und lassen sich in der Plugin-Liste abschalten.
+- Einstellungsseite zeigt im Fuß, ob Updates automatisch installiert werden.
+
 ## 1.0.1 – 2026-10-31
 
 - Einstellungsseite: Statuszeilen mit Akzentlinie statt getönter Fläche, damit sie auch mit Dunkelmodus-Erweiterungen im Browser lesbar bleiben.

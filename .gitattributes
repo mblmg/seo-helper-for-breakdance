@@ -1,0 +1,4 @@
+# Nicht ins Plugin-ZIP und nicht in den Quellcode-Download der Releases
+/.github export-ignore
+/.gitattributes export-ignore
+/.gitignore export-ignore
