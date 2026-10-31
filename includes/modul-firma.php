@@ -5,7 +5,8 @@
  * Yoast SEO meldet in der Gratisversion nur eine allgemeine Organisation. Typ als lokales
  * Unternehmen, Adresse, Einzugsgebiet, Öffnungszeiten, Profile und Angebote gibt es dort
  * erst mit dem kostenpflichtigen Local-SEO-Add-on. Dieses Modul ergänzt sie an Yoasts
- * Organisation, deren Name, Logo, Telefon und E-Mail weiter aus Yoast kommen.
+ * Organisation. Name und Logo kommen aus Yoast; Beschreibung, Telefon, E-Mail, Gründungsdatum
+ * und USt-ID aus Yoasts Einstellungen trägt das Modul selbst ein, weil Yoast sie nicht ausgibt.
  *
  * Voraussetzung: In Yoast ist die Website als Organisation eingetragen, nicht als Person.
  */
@@ -285,6 +286,23 @@ add_filter('wpseo_schema_organization', function ($data) {
         $neu['sameAs'] = array_values(array_unique(array_merge((array) ($data['sameAs'] ?? []), $neu['sameAs'])));
     }
 
-    // Yoast-Angaben wie Name, Logo, Telefon und E-Mail bleiben, die Ergänzungen kommen dazu.
+    // Angaben aus Yoasts Einstellungen, die Yoast selbst nicht ins Schema schreibt.
+    if (class_exists('WPSEO_Options')) {
+        $aus_yoast = [
+            'description'  => 'org-description',
+            'telephone'    => 'org-phone',
+            'email'        => 'org-email',
+            'foundingDate' => 'org-founding-date',
+            'vatID'        => 'org-vat-id',
+        ];
+        foreach ($aus_yoast as $schluessel => $option) {
+            $wert = trim((string) WPSEO_Options::get($option, ''));
+            if ($wert !== '' && empty($data[$schluessel])) {
+                $data[$schluessel] = $wert;
+            }
+        }
+    }
+
+    // Yoast-Angaben wie Name und Logo bleiben, die Ergänzungen kommen dazu.
     return array_merge($data, $neu);
 }, 20);

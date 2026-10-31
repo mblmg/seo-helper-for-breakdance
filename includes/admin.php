@@ -247,7 +247,7 @@ function imm_sh_seite()
                 imm_sh_schalter('firma', __('Firmenprofil für Google', 'imm-seo-helfer'), $o['firma'], $gesperrt, 'imm-sh-firma');
                 $f = imm_sh_firma_daten();
                 ?>
-                <p class="imm-sh__text"><?php esc_html_e('Yoast meldet Google nur eine allgemeine Organisation. Der Helfer ergänzt, was die lokale Suche und KI-Suchen brauchen: Art des Unternehmens, Adresse, Einzugsgebiet, Öffnungszeiten, Profile wie das Google-Unternehmensprofil und Angebote. Name, Logo, Telefon und E-Mail kommen weiter aus Yoast. Besucher sehen davon nichts.', 'imm-seo-helfer'); ?></p>
+                <p class="imm-sh__text"><?php esc_html_e('Yoast meldet Google nur eine allgemeine Organisation. Der Helfer ergänzt, was die lokale Suche und KI-Suchen brauchen: Art des Unternehmens, Adresse, Einzugsgebiet, Öffnungszeiten, Profile wie das Google-Unternehmensprofil und Angebote. Name, Logo, Beschreibung, Telefon und E-Mail kommen aus den Yoast-Einstellungen. Besucher sehen davon nichts.', 'imm-seo-helfer'); ?></p>
                 <?php if (!imm_sh_fehlt_hinweis('firma')) : ?>
                     <?php if (!imm_sh_firma_yoast_organisation()) : ?>
                         <p class="imm-sh__fehlt">

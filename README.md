@@ -36,7 +36,7 @@ Auf dem ersten bzw. letzten Kapitel und in ausgeschalteten Bereichen sind die Ka
 | Angebote | eine Zeile pro Angebot: `Name \| Preis \| Einheit \| Beschreibung`; mit Einheit (z. B. `Monat`) wird ein Abo-Preis daraus, ohne ein Einmalpreis |
 | Profile, Einzugsgebiet, Fachgebiete | eine Angabe pro Zeile; `Deutschland`, `Österreich`, `Schweiz` werden als Land gemeldet, alles andere als Ort |
 
-Name, Logo, Telefon und E-Mail kommen weiter aus den Yoast-Einstellungen.
+Name, Logo, Beschreibung, Telefon, E-Mail, Gründungsdatum und USt-ID kommen aus den Yoast-Einstellungen (Website-Darstellung). Yoast schreibt sie selbst nicht alle ins Schema, der Helfer ergänzt sie.
 
 ## Installation und Updates
 
