@@ -1,0 +1,311 @@
+/* SEO-Helfer für Breakdance: Einstellungsseite
+ * Folgt dem Farbschema des WordPress-Backends (--wp-admin-theme-color), damit die
+ * Seite auf jeder Website passt.
+ */
+.imm-sh {
+    --imm-akzent: var(--wp-admin-theme-color, #2271b1);
+    --imm-tinte: #1d2327;
+    --imm-grau: #50575e;
+    --imm-rand: #dcdcde;
+    --imm-linie: #f0f0f1;
+    --imm-papier: #fff;
+    --imm-gut: #00a32a;
+    max-width: 760px;
+    color: var(--imm-tinte);
+}
+
+.imm-sh .imm-sh__titel {
+    margin-bottom: 4px;
+    font-size: 26px;
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+.imm-sh__intro {
+    max-width: 62ch;
+    margin: 0 0 12px;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--imm-grau);
+}
+
+/* Gefundene Plugins ----------------------------------------------------- */
+
+.imm-sh__umgebung {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 20px;
+    padding: 0;
+    list-style: none;
+}
+
+.imm-sh__umgebung li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    padding: 4px 10px 4px 8px;
+    border: 1px solid var(--imm-rand);
+    border-radius: 999px;
+    background: var(--imm-papier);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.imm-sh__umgebung li::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--imm-gut);
+}
+
+.imm-sh__umgebung li.ist-weg::before {
+    background: #c3c4c7;
+}
+
+.imm-sh__umgebung span {
+    font-weight: 400;
+    color: var(--imm-grau);
+}
+
+/* Karten ------------------------------------------------------------------ */
+
+.imm-sh__karte {
+    margin-bottom: 24px;
+    border: 1px solid var(--imm-rand);
+    border-radius: 8px;
+    background: var(--imm-papier);
+}
+
+.imm-sh .imm-sh__abschnitt {
+    margin: 0;
+    padding: 18px 24px 14px;
+    border-bottom: 1px solid var(--imm-rand);
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.imm-sh__zeile {
+    padding: 20px 24px;
+}
+
+.imm-sh__zeile + .imm-sh__zeile {
+    border-top: 1px solid var(--imm-linie);
+}
+
+/* Schalter ---------------------------------------------------------------- */
+
+.imm-sh__schalter {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.imm-sh__schalter input {
+    position: absolute;
+    width: 40px;
+    height: 22px;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.imm-sh__regler {
+    position: relative;
+    flex-shrink: 0;
+    width: 40px;
+    height: 22px;
+    border-radius: 11px;
+    background: #c3c4c7;
+    transition: background-color 0.15s ease;
+}
+
+.imm-sh__regler::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--imm-papier);
+    transition: transform 0.15s ease;
+}
+
+.imm-sh__schalter input:checked + .imm-sh__regler {
+    background: var(--imm-akzent);
+}
+
+.imm-sh__schalter input:checked + .imm-sh__regler::after {
+    transform: translateX(18px);
+}
+
+.imm-sh__schalter input:focus-visible + .imm-sh__regler {
+    outline: 2px solid var(--imm-akzent);
+    outline-offset: 2px;
+}
+
+.imm-sh__schalter.ist-gesperrt {
+    cursor: not-allowed;
+}
+
+.imm-sh__schalter.ist-gesperrt input {
+    cursor: not-allowed;
+}
+
+.imm-sh__schalter.ist-gesperrt .imm-sh__regler {
+    background: #e0e0e0;
+}
+
+.imm-sh__schalter.ist-gesperrt .imm-sh__name {
+    color: var(--imm-grau);
+}
+
+.imm-sh__name {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+/* Texte unter den Schaltern ---------------------------------------------- */
+
+.imm-sh__text {
+    max-width: 64ch;
+    margin: 8px 0 0 52px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--imm-grau);
+}
+
+.imm-sh__felder .imm-sh__text {
+    margin: 16px 24px 0;
+}
+
+.imm-sh__stand,
+.imm-sh__fehlt {
+    max-width: 64ch;
+    margin: 12px 0 0 52px;
+    padding: 2px 0 2px 12px;
+    border-left: 3px solid var(--imm-akzent);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.imm-sh__stand a {
+    margin-left: 6px;
+}
+
+.imm-sh__fehlt {
+    border-left-color: #dba617;
+}
+
+/* Bereiche der Kapitel-Navigation ---------------------------------------- */
+
+.imm-sh__bereiche {
+    margin: 14px 0 0 52px;
+    padding: 0;
+    border: 0;
+    transition: opacity 0.15s ease;
+}
+
+.imm-sh__bereiche.ist-aus {
+    opacity: 0.45;
+}
+
+.imm-sh__bereiche legend {
+    margin-bottom: 4px;
+    font-size: 13px;
+    color: var(--imm-grau);
+}
+
+.imm-sh__bereich {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 0;
+    font-size: 14px;
+}
+
+.imm-sh__bereich input {
+    margin: 0;
+}
+
+.imm-sh__anzahl {
+    font-size: 13px;
+    color: var(--imm-grau);
+}
+
+.imm-sh__aktion {
+    margin: 0;
+    padding: 14px 24px;
+    border-top: 1px solid var(--imm-rand);
+    border-radius: 0 0 8px 8px;
+    background: #f6f7f7;
+}
+
+/* Datenfelder ------------------------------------------------------------ */
+
+.imm-sh__liste {
+    display: grid;
+    grid-template-columns: minmax(12rem, max-content) 1fr;
+    gap: 10px 20px;
+    margin: 16px 24px 20px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.imm-sh__liste dt {
+    font-weight: 600;
+}
+
+.imm-sh__liste dd {
+    margin: 0;
+    color: var(--imm-grau);
+}
+
+.imm-sh__fuss {
+    font-size: 12px;
+    color: var(--imm-grau);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .imm-sh__regler,
+    .imm-sh__regler::after,
+    .imm-sh__bereiche {
+        transition: none;
+    }
+}
+
+@media (max-width: 600px) {
+    .imm-sh .imm-sh__abschnitt,
+    .imm-sh__zeile,
+    .imm-sh__aktion {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .imm-sh__text,
+    .imm-sh__stand,
+    .imm-sh__fehlt,
+    .imm-sh__bereiche {
+        margin-left: 0;
+    }
+
+    .imm-sh__felder .imm-sh__text,
+    .imm-sh__liste {
+        margin-left: 16px;
+        margin-right: 16px;
+    }
+
+    .imm-sh__liste {
+        grid-template-columns: 1fr;
+        gap: 2px;
+    }
+
+    .imm-sh__liste dd {
+        margin-bottom: 10px;
+    }
+}
