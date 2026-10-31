@@ -61,7 +61,7 @@ add_action('admin_post_imm_sh_speichern', function () {
     $o        = imm_sh_optionen();
 
     // Gesperrte Schalter (fehlendes Plugin) behalten ihren Wert für später.
-    foreach (['sitemap_bilder', 'hauptbild', 'kapitel'] as $modul) {
+    foreach (['sitemap_bilder', 'hauptbild', 'kapitel', 'firma'] as $modul) {
         if (imm_sh_fehlt($modul) === []) {
             $o[$modul] = !empty($_POST[$modul]);
         }
@@ -69,6 +69,21 @@ add_action('admin_post_imm_sh_speichern', function () {
     if (imm_sh_fehlt('kapitel') === []) {
         $o['kapitel_bereiche'] = $bereiche;
     }
+
+    // Firmendaten auch speichern, wenn das Modul gerade aus ist.
+    $eingabe = wp_unslash((array) ($_POST['firma_daten'] ?? []));
+    $daten   = [];
+    foreach (imm_sh_firma_standard() as $feld => $standard) {
+        $wert = (string) ($eingabe[$feld] ?? $standard);
+        $daten[$feld] = in_array($feld, ['einzugsgebiet', 'oeffnungszeiten', 'profile', 'themen', 'sprachen', 'angebote'], true)
+            ? sanitize_textarea_field($wert)
+            : sanitize_text_field($wert);
+    }
+    if (!isset(imm_sh_firma_typen()[$daten['typ']])) {
+        $daten['typ'] = 'LocalBusiness';
+    }
+    $daten['land']     = strtoupper(substr($daten['land'], 0, 2));
+    $o['firma_daten']  = $daten;
     update_option(IMM_SH_OPTION, $o);
 
     delete_transient('imm_sh_sitemap_kennzahlen');
@@ -222,6 +237,106 @@ function imm_sh_seite()
                     <?php else : ?>
                         <p class="imm-sh__stand"><?php esc_html_e('Noch kein Bereich auf dieser Website. Sobald eine Seite mindestens zwei veröffentlichte Unterseiten hat, erscheint sie hier zum Einschalten.', 'imm-seo-helfer'); ?></p>
                     <?php endif; ?>
+                <?php endif; ?>
+            </div>
+
+            <?php /* Firmenprofil */ ?>
+            <div class="imm-sh__zeile">
+                <?php
+                $gesperrt = imm_sh_fehlt('firma') !== [];
+                imm_sh_schalter('firma', __('Firmenprofil für Google', 'imm-seo-helfer'), $o['firma'], $gesperrt, 'imm-sh-firma');
+                $f = imm_sh_firma_daten();
+                ?>
+                <p class="imm-sh__text"><?php esc_html_e('Yoast meldet Google nur eine allgemeine Organisation. Der Helfer ergänzt, was die lokale Suche und KI-Suchen brauchen: Art des Unternehmens, Adresse, Einzugsgebiet, Öffnungszeiten, Profile wie das Google-Unternehmensprofil und Angebote. Name, Logo, Telefon und E-Mail kommen weiter aus Yoast. Besucher sehen davon nichts.', 'imm-seo-helfer'); ?></p>
+                <?php if (!imm_sh_fehlt_hinweis('firma')) : ?>
+                    <?php if (!imm_sh_firma_yoast_organisation()) : ?>
+                        <p class="imm-sh__fehlt">
+                            <?php esc_html_e('In Yoast ist die Website noch nicht als Organisation mit Namen eingetragen. Ohne das gibt es kein Firmenprofil, das der Helfer ergänzen kann.', 'imm-seo-helfer'); ?>
+                            <a href="<?php echo esc_url(admin_url('admin.php?page=wpseo_page_settings#/site-representation')); ?>"><?php esc_html_e('Zur Yoast-Einstellung', 'imm-seo-helfer'); ?></a>
+                        </p>
+                    <?php elseif ($o['firma']) : ?>
+                        <p class="imm-sh__stand">
+                            <?php esc_html_e('Aktiv auf jeder Seite der Website.', 'imm-seo-helfer'); ?>
+                            <a href="<?php echo esc_url('https://search.google.com/test/rich-results?url=' . rawurlencode(home_url('/'))); ?>" target="_blank" rel="noopener"><?php esc_html_e('Bei Google prüfen', 'imm-seo-helfer'); ?></a>
+                        </p>
+                    <?php endif; ?>
+
+                    <fieldset class="imm-sh__firma" id="imm-sh-firma">
+                        <legend><?php esc_html_e('Angaben zum Unternehmen', 'imm-seo-helfer'); ?></legend>
+
+                        <div class="imm-sh__feld imm-sh__feld--breit">
+                            <label for="imm-sh-typ"><?php esc_html_e('Art des Unternehmens', 'imm-seo-helfer'); ?></label>
+                            <select id="imm-sh-typ" name="firma_daten[typ]">
+                                <?php foreach (imm_sh_firma_typen() as $typ => $titel) : ?>
+                                    <option value="<?php echo esc_attr($typ); ?>" <?php selected($f['typ'], $typ); ?>><?php echo esc_html($titel); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <div class="imm-sh__feld imm-sh__feld--breit">
+                            <label for="imm-sh-strasse"><?php esc_html_e('Straße und Hausnummer', 'imm-seo-helfer'); ?></label>
+                            <input type="text" id="imm-sh-strasse" name="firma_daten[strasse]" value="<?php echo esc_attr($f['strasse']); ?>">
+                            <span class="imm-sh__hilfe"><?php esc_html_e('Nur eintragen, wenn sie auch im Google-Unternehmensprofil sichtbar ist.', 'imm-seo-helfer'); ?></span>
+                        </div>
+                        <div class="imm-sh__feld">
+                            <label for="imm-sh-plz"><?php esc_html_e('PLZ', 'imm-seo-helfer'); ?></label>
+                            <input type="text" id="imm-sh-plz" name="firma_daten[plz]" value="<?php echo esc_attr($f['plz']); ?>" inputmode="numeric">
+                        </div>
+                        <div class="imm-sh__feld">
+                            <label for="imm-sh-ort"><?php esc_html_e('Ort', 'imm-seo-helfer'); ?></label>
+                            <input type="text" id="imm-sh-ort" name="firma_daten[ort]" value="<?php echo esc_attr($f['ort']); ?>">
+                        </div>
+                        <div class="imm-sh__feld">
+                            <label for="imm-sh-region"><?php esc_html_e('Bundesland', 'imm-seo-helfer'); ?></label>
+                            <input type="text" id="imm-sh-region" name="firma_daten[region]" value="<?php echo esc_attr($f['region']); ?>">
+                        </div>
+                        <div class="imm-sh__feld">
+                            <label for="imm-sh-land"><?php esc_html_e('Land (Kürzel)', 'imm-seo-helfer'); ?></label>
+                            <input type="text" id="imm-sh-land" name="firma_daten[land]" value="<?php echo esc_attr($f['land']); ?>" maxlength="2">
+                        </div>
+                        <div class="imm-sh__feld">
+                            <label for="imm-sh-inhaber"><?php esc_html_e('Inhaber oder Inhaberin', 'imm-seo-helfer'); ?></label>
+                            <input type="text" id="imm-sh-inhaber" name="firma_daten[inhaber]" value="<?php echo esc_attr($f['inhaber']); ?>">
+                        </div>
+                        <div class="imm-sh__feld">
+                            <label for="imm-sh-preisrahmen"><?php esc_html_e('Preisrahmen', 'imm-seo-helfer'); ?></label>
+                            <select id="imm-sh-preisrahmen" name="firma_daten[preisrahmen]">
+                                <?php foreach (['' => __('keine Angabe', 'imm-seo-helfer'), '€' => '€', '€€' => '€€', '€€€' => '€€€', '€€€€' => '€€€€'] as $wert => $titel) : ?>
+                                    <option value="<?php echo esc_attr($wert); ?>" <?php selected($f['preisrahmen'], $wert); ?>><?php echo esc_html($titel); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <div class="imm-sh__feld imm-sh__feld--breit">
+                            <label for="imm-sh-profile"><?php esc_html_e('Profile, eine Adresse pro Zeile', 'imm-seo-helfer'); ?></label>
+                            <textarea id="imm-sh-profile" name="firma_daten[profile]" rows="3" placeholder="https://maps.app.goo.gl/…"><?php echo esc_textarea($f['profile']); ?></textarea>
+                            <span class="imm-sh__hilfe"><?php esc_html_e('Google-Unternehmensprofil, LinkedIn, Branchenverzeichnisse. Der Link zum Google-Profil wird zusätzlich als Karte gemeldet.', 'imm-seo-helfer'); ?></span>
+                        </div>
+                        <div class="imm-sh__feld imm-sh__feld--breit">
+                            <label for="imm-sh-einzugsgebiet"><?php esc_html_e('Einzugsgebiet, ein Ort pro Zeile', 'imm-seo-helfer'); ?></label>
+                            <textarea id="imm-sh-einzugsgebiet" name="firma_daten[einzugsgebiet]" rows="4"><?php echo esc_textarea($f['einzugsgebiet']); ?></textarea>
+                            <span class="imm-sh__hilfe"><?php esc_html_e('Städte, Kreise oder „Deutschland“.', 'imm-seo-helfer'); ?></span>
+                        </div>
+                        <div class="imm-sh__feld imm-sh__feld--breit">
+                            <label for="imm-sh-oeffnungszeiten"><?php esc_html_e('Öffnungszeiten, eine Zeile pro Zeitraum', 'imm-seo-helfer'); ?></label>
+                            <textarea id="imm-sh-oeffnungszeiten" name="firma_daten[oeffnungszeiten]" rows="3" placeholder="Mo–Fr 09:00–18:00&#10;Sa 10:00–14:00"><?php echo esc_textarea($f['oeffnungszeiten']); ?></textarea>
+                            <span class="imm-sh__hilfe"><?php esc_html_e('Tage mit Komma oder Bindestrich, mehrere Zeitspannen mit Komma: „Mo, Di, Do–Sa 09:00–19:00“ oder „Mo–Fr 9–12, 14–18“. Geschlossene Tage einfach weglassen.', 'imm-seo-helfer'); ?></span>
+                        </div>
+                        <div class="imm-sh__feld imm-sh__feld--breit">
+                            <label for="imm-sh-angebote"><?php esc_html_e('Angebote, eines pro Zeile', 'imm-seo-helfer'); ?></label>
+                            <textarea id="imm-sh-angebote" name="firma_daten[angebote]" rows="5" placeholder="Name | Preis | Einheit | Beschreibung"><?php echo esc_textarea($f['angebote']); ?></textarea>
+                            <span class="imm-sh__hilfe"><?php esc_html_e('Aufbau: Name | Preis in Euro | Einheit | Beschreibung. Nur der Name ist Pflicht. Einheit z. B. „Monat“ für Abos, leer für Einmalpreise.', 'imm-seo-helfer'); ?></span>
+                        </div>
+                        <div class="imm-sh__feld imm-sh__feld--breit">
+                            <label for="imm-sh-themen"><?php esc_html_e('Fachgebiete, eines pro Zeile', 'imm-seo-helfer'); ?></label>
+                            <textarea id="imm-sh-themen" name="firma_daten[themen]" rows="3"><?php echo esc_textarea($f['themen']); ?></textarea>
+                            <span class="imm-sh__hilfe"><?php esc_html_e('Worin das Unternehmen sich auskennt. KI-Suchen nutzen das, um es passenden Fragen zuzuordnen.', 'imm-seo-helfer'); ?></span>
+                        </div>
+                        <div class="imm-sh__feld">
+                            <label for="imm-sh-sprachen"><?php esc_html_e('Sprachen', 'imm-seo-helfer'); ?></label>
+                            <input type="text" id="imm-sh-sprachen" name="firma_daten[sprachen]" value="<?php echo esc_attr($f['sprachen']); ?>" placeholder="de, en">
+                        </div>
+                    </fieldset>
                 <?php endif; ?>
             </div>
 

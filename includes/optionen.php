@@ -13,7 +13,10 @@ if (!defined('ABSPATH')) {
  * kapitel_bereiche: IDs der Elternseiten, deren Unterseiten eine Kapitel-Navigation bekommen.
  * Neue Bereiche sind aus, bis sie jemand einschaltet.
  *
- * @return array{sitemap_bilder: bool, hauptbild: bool, kapitel: bool, kapitel_bereiche: int[]}
+ * firma_daten: Angaben für das Firmenprofil (siehe imm_sh_firma_standard()). Das Modul ist aus,
+ * bis jemand es einschaltet, weil die Angaben auf jeder Website andere sind.
+ *
+ * @return array{sitemap_bilder: bool, hauptbild: bool, kapitel: bool, kapitel_bereiche: int[], firma: bool, firma_daten: array}
  */
 function imm_sh_optionen()
 {
@@ -22,6 +25,8 @@ function imm_sh_optionen()
         'hauptbild'        => true,
         'kapitel'          => false,
         'kapitel_bereiche' => [],
+        'firma'            => false,
+        'firma_daten'      => [],
     ];
     $gespeichert = get_option(IMM_SH_OPTION, []);
     $o           = array_merge($standard, is_array($gespeichert) ? $gespeichert : []);
@@ -68,6 +73,7 @@ function imm_sh_fehlt($modul)
         'hauptbild'      => ['yoast'],
         'kapitel'        => ['breakdance'],
         'autor'          => ['breakdance'],
+        'firma'          => ['yoast'],
     ];
     $fehlt = [];
     foreach ($braucht[$modul] ?? [] as $plugin) {

@@ -10,6 +10,7 @@ WordPress-Plugin von i-make.media. Es schließt Lücken zwischen dem Pagebuilder
 | Vorschaubild als Hauptbild | Yoast SEO | Hat eine Seite kein Beitragsbild, aber ein eigenes Yoast-Social-Bild, wird dieses im Schema als `primaryImageOfPage` gemeldet. |
 | Kapitel-Navigation | Breakdance | Datenfelder für vorheriges und nächstes Kapitel unter einer Elternseite. Reihenfolge = Seitenreihenfolge (`menu_order`). Bereiche werden einzeln eingeschaltet. |
 | Autoren-Bio in Absätzen | Breakdance | Datenfeld mit den biografischen Angaben des Autors, Leerzeilen werden zu Absätzen. |
+| Firmenprofil für Google | Yoast SEO | Ergänzt Yoasts Organisation im Schema um Unternehmenstyp (z. B. `ProfessionalService`), Adresse, Einzugsgebiet, Öffnungszeiten, Profile (`sameAs`, Google-Profil als `hasMap`), Inhaber, Fachgebiete, Sprachen und Angebote. Das kann Yoast nur mit dem kostenpflichtigen Local-SEO-Add-on. Standardmäßig aus, weil die Angaben je Website anders sind. Voraussetzung: In Yoast ist die Website als Organisation eingetragen. |
 
 Fehlt ein benötigtes Plugin, ruht der Helfer und die Einstellungsseite sagt, warum. Einstellungen unter **Einstellungen → SEO-Helfer**.
 
@@ -26,6 +27,16 @@ Kategorie „SEO-Helfer“ in der Auswahl der dynamischen Daten:
 | `imm_sh_autor_bio` | Autoren-Bio als HTML-Absätze (Text-Element mit Tag `div`) |
 
 Auf dem ersten bzw. letzten Kapitel und in ausgeschalteten Bereichen sind die Kapitelfelder leer. Elemente dafür mit der Bedingung „ist nicht leer“ ausblenden.
+
+## Firmenprofil: Eingabeformate
+
+| Feld | Format |
+|---|---|
+| Öffnungszeiten | eine Zeile pro Zeitraum, z. B. `Mo, Di, Do–Sa 09:00–19:00` oder `Mo–Fr 9–12, 14–18`; geschlossene Tage weglassen |
+| Angebote | eine Zeile pro Angebot: `Name \| Preis \| Einheit \| Beschreibung`; mit Einheit (z. B. `Monat`) wird ein Abo-Preis daraus, ohne ein Einmalpreis |
+| Profile, Einzugsgebiet, Fachgebiete | eine Angabe pro Zeile; `Deutschland`, `Österreich`, `Schweiz` werden als Land gemeldet, alles andere als Ort |
+
+Name, Logo, Telefon und E-Mail kommen weiter aus den Yoast-Einstellungen.
 
 ## Installation und Updates
 
@@ -47,7 +58,7 @@ Die GitHub-Action unter `.github/workflows/release.yml` merkt, dass es für dies
 imm-seo-helfer.php            Plugin-Kopf, Konstanten, lädt die Module
 includes/optionen.php         Einstellungen, Erkennung von Breakdance und Yoast
 includes/breakdance-bilder.php  Bilder im Breakdance-Elementbaum finden
-includes/modul-*.php          je ein Helfer
+includes/modul-*.php          je ein Helfer (sitemap-bilder, hauptbild, kapitel, autor, firma)
 includes/admin.php            Einstellungsseite
 includes/updates.php          Updates über GitHub-Releases
 lib/plugin-update-checker/    Bibliothek für die Updates (YahnisElsts, MIT)

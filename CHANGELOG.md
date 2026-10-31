@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.0 – 2026-10-31
+
+- Neuer Helfer „Firmenprofil für Google“: ergänzt Yoasts Organisation im Schema um Unternehmenstyp, Adresse, Einzugsgebiet, Öffnungszeiten, Profile mit Google-Unternehmensprofil als Karte, Inhaber, Fachgebiete, Sprachen und Angebote mit Preisen. Standardmäßig aus; Eingabe auf der Einstellungsseite.
+- Einstellungsseite weist darauf hin, wenn Yoast die Website nicht als Organisation führt, und verlinkt den Rich-Results-Test von Google.
+
 ## 1.1.0 – 2026-10-31
 
 - Updates über GitHub: Neue Versionen kommen aus den Releases dieses Repositorys und erscheinen in WordPress wie normale Plugin-Updates (Plugin Update Checker 5.7).

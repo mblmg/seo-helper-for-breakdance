@@ -238,6 +238,58 @@
     color: var(--imm-grau);
 }
 
+/* Firmenprofil ------------------------------------------------------------ */
+
+.imm-sh__firma {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 16px;
+    margin: 16px 0 0 52px;
+    padding: 0;
+    border: 0;
+    transition: opacity 0.15s ease;
+}
+
+.imm-sh__firma.ist-aus {
+    opacity: 0.45;
+}
+
+.imm-sh__firma legend {
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: var(--imm-grau);
+}
+
+.imm-sh__feld {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.imm-sh__feld--breit {
+    grid-column: 1 / -1;
+}
+
+.imm-sh__feld label {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.imm-sh__feld input,
+.imm-sh__feld select,
+.imm-sh__feld textarea {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+}
+
+.imm-sh__hilfe {
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--imm-grau);
+}
+
 .imm-sh__aktion {
     margin: 0;
     padding: 14px 24px;
@@ -274,7 +326,8 @@
 @media (prefers-reduced-motion: reduce) {
     .imm-sh__regler,
     .imm-sh__regler::after,
-    .imm-sh__bereiche {
+    .imm-sh__bereiche,
+    .imm-sh__firma {
         transition: none;
     }
 }
@@ -290,8 +343,13 @@
     .imm-sh__text,
     .imm-sh__stand,
     .imm-sh__fehlt,
-    .imm-sh__bereiche {
+    .imm-sh__bereiche,
+    .imm-sh__firma {
         margin-left: 0;
+    }
+
+    .imm-sh__firma {
+        grid-template-columns: 1fr;
     }
 
     .imm-sh__felder .imm-sh__text,
